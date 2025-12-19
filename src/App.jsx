@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import {Button } from "./components/ui/button.jsx"
-import './App.css'
+import PlayerBar from "./components/ui/PlayerBar";
+import Sidebar from "./components/ui/Sidebar";
+import Trending from "./components/ui/Trending";
 
-function App() {
-  const [count, setCount] = useState(0)
 
+export default function App() {
   return (
-    <>
-      <h1 className='text-center'>Music App</h1>
-      <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button>Click me</Button>
-    </div>
-    </>
-  )
-}
+    <div className="flex bg-black text-white min-h-screen">
+      <Sidebar />
 
-export default App
+      <main className="flex-1 p-6">
+        <Trending />
+      </main>
+
+      <PlayerBar />
+    </div>
+  );
+}
