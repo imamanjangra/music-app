@@ -1,88 +1,107 @@
 import { SkipBack, SkipForward } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import VolumeControl from "./VolumeControl";
 import ProgressBar from "./ProgressBar";
 import song_details from "../Hooks/song_details";
 
 export default function PlayerBar() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const api_data = song_details()
-  const song_ref = useRef()
+  const [volume, setVolume] = useState(50);
+  const [progress, setProgress] = useState(0);
 
-  if(!api_data){
-    return;
-  }
+  const audioRef = useRef(null);
+  const api_data = song_details();
+  const song = api_data?.data?.[0];
+  const duration = Number(song?.duration || 0);
 
+  
+   useEffect(() => {
+    if (!song) return;
+
+    const songUrl = song.downloadUrl?.[4]?.url;
+    const audio = new Audio(songUrl);
+
+    audioRef.current = audio;
+   
+    const updateProgress = () => {
+      setProgress(audio.currentTime);
+    };
+
+    audio.addEventListener("timeupdate", updateProgress);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener("timeupdate", updateProgress);
+    };
+  }, [song]);
+
+  
   useEffect(() => {
-    
-  } , [])
+    if (!audioRef.current) return;
 
-  const handlingPlaying = () => {
-    setIsPlaying(!isPlaying)
-    if(isPlaying == true){
-      const song_url = song.downloadUrl?.[4].url
-      song_url.play();
+    isPlaying
+      ? audioRef.current.play()
+      : audioRef.current.pause();
+  }, [isPlaying]);
+
+  
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
     }
-  }
+  }, [volume]);
 
-  // console.log(api_data)
-
-  const song = api_data?.data?.[0]
-
-  console.log(song);
+  if (!song) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-[#111] text-white">
       <div className="px-6 pt-2">
-        <ProgressBar />
+        <ProgressBar
+          progress={progress}
+          setProgress={setProgress}
+          duration={duration}
+          isPlaying={isPlaying}
+          audioRef={audioRef}
+        />
       </div>
 
       <div className="h-20 px-6 flex items-center justify-between">
         <div className="flex items-center gap-4 w-1/3">
           <img
-            src={song.image?.[0].url}
+            src={song.image?.[0]?.url}
             alt="song"
             className="w-12 h-12 rounded"
           />
           <div>
             <p className="text-sm font-medium">{song.name}</p>
-            <p className="text-xs text-gray-400">The Wanderers</p>
+            <p className="text-xs text-gray-400">
+              {song.artists?.primary?.[0]?.name}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-6 w-1/3 justify-center">
-          <SkipBack className="cursor-pointer text-gray-300 hover:text-white" />
-
+          <SkipBack />
           <div
-            onClick={handlingPlaying}
+            onClick={() => setIsPlaying((p) => !p)}
             className="w-10 h-10 rounded-full bg-[#00FF88] flex items-center justify-center text-black cursor-pointer"
           >
             {isPlaying ? (
-              <svg
-                width="24"
-                height="24"
-                fill="currentColor"
-                viewBox="0 0 16 16"
-              >
-                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
+              <svg width="24" height="24" fill="currentColor">
+                <rect x="5" y="4" width="4" height="16" />
+                <rect x="15" y="4" width="4" height="16" />
               </svg>
             ) : (
-              <svg
-                width="24"
-                height="24"
-                fill="currentColor"
-                viewBox="0 0 16 16"
-              >
-                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
+              <svg width="24" height="24" fill="currentColor">
+                <polygon points="5,3 19,12 5,21" />
               </svg>
             )}
           </div>
-
-          <SkipForward className="cursor-pointer text-gray-300 hover:text-white" />
+          <SkipForward />
         </div>
 
         <div className="w-1/3 flex justify-end">
-          <VolumeControl />
+          <VolumeControl volume={volume} setVolume={setVolume} audioRef={audioRef} />
         </div>
       </div>
     </div>
