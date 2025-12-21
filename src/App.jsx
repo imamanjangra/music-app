@@ -1,18 +1,46 @@
-import { useState } from 'react'
-import {Button } from "./components/ui/button.jsx"
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/FirebaseContext";
+import Login from "./pages/login";
+import SignUp from "./pages/signup";
+import Home from "./pages/Home.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastProvider } from "./context/toastContext";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <h1 className='text-center'>Music App</h1>
-      <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button>Click me</Button>
-    </div>
-    </>
-  )
+    <ToastProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen flex items-center justify-center p-4">
+              <Routes>
+                <Route path="/" element={<Navigate to="/login" />} />
+
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+
+                <Route
+                  path="/home"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </Routes>
+            </div>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </ToastProvider>
+  );
 }
 
-export default App
+export default App;
