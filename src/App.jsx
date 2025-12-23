@@ -4,33 +4,21 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/FirebaseContext";
-import { ToastProvider } from "./context/toastContext";
-
 import Login from "./pages/login";
 import SignUp from "./pages/signup";
 import Home from "./pages/Home.jsx";
-import LikedSongs from "./pages/LikedSongs.jsx";
-import LibraryPage from "./pages/LibraryPage.jsx";
-import SearchPage from "./pages/SearchPage.jsx";
-import { Profile } from "./pages/profile";
-
 import ProtectedRoute from "./components/ProtectedRoute";
-import PlayerBar from "./components/ui/PlayerBar";
-import Topsong_api from "./components/Hooks/Topsong_api";
-
+import { ToastProvider } from "./context/toastContext";
+import { Profile } from "./pages/profile";
 function App() {
-  const api_data = Topsong_api();
-  console.log(api_data);
-
   return (
     <ToastProvider>
       <ThemeProvider>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen bg-black text-white">
+            <div className="min-h-screen flex items-center justify-center p-4">
               <Routes>
                 <Route path="/" element={<Navigate to="/login" />} />
 
