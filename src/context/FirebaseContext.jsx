@@ -26,6 +26,13 @@ export function AuthProvider({ children }) {
 
     const initAuth = async () => {
       try {
+        // Check if auth is properly initialized
+        if (!auth || typeof auth.onAuthStateChanged !== "function") {
+          console.warn("Firebase Auth not properly initialized");
+          setLoading(false);
+          return;
+        }
+
         const result = await getRedirectResult(auth);
         if (result) {
           console.log("Redirect result:", result.user);
@@ -35,10 +42,15 @@ export function AuthProvider({ children }) {
         console.error("Redirect error:", error.code, error.message);
       }
 
-      unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
+      try {
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          setUser(user);
+          setLoading(false);
+        });
+      } catch (error) {
+        console.error("Auth state change error:", error);
         setLoading(false);
-      });
+      }
     };
 
     initAuth();
