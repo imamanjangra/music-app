@@ -2,24 +2,34 @@ import { SkipBack, SkipForward } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import VolumeControl from "./VolumeControl";
 import ProgressBar from "./ProgressBar";
-import song_details from "../Hooks/song_details";
+import Song_details from "../Hooks/song_details";
 
-export default function PlayerBar() {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
   const [volume, setVolume] = useState(50);
+  const [id, setId] = useState(null);
   const [progress, setProgress] = useState(0);
 
   const audioRef = useRef(null);
-  const api_data = song_details();
+
+  // 🔹 set song id when index changes
+  useEffect(() => {
+    if (mainId === null || !value?.length) return;
+    setId(value[mainId]);
+  }, [mainId, value]);
+
+  const api_data = Song_details(id);
   const song = api_data?.data?.[0];
   const duration = Number(song?.duration || 0);
 
+  // 🔹 create & load audio
   useEffect(() => {
     if (!song) return;
 
     const songUrl = song.downloadUrl?.[4]?.url;
-    const audio = new Audio(songUrl);
+    if (!songUrl) return;
 
+    const audio = new Audio(songUrl);
+    audio.volume = volume / 100;
     audioRef.current = audio;
 
     const updateProgress = () => {
@@ -27,6 +37,10 @@ export default function PlayerBar() {
     };
 
     audio.addEventListener("timeupdate", updateProgress);
+
+    if (isPlay) {
+      audio.play();
+    }
 
     return () => {
       audio.pause();
@@ -37,9 +51,10 @@ export default function PlayerBar() {
   useEffect(() => {
     if (!audioRef.current) return;
 
-    isPlaying ? audioRef.current.play() : audioRef.current.pause();
-  }, [isPlaying]);
+    isPlay ? audioRef.current.play() : audioRef.current.pause();
+  }, [isPlay]);
 
+  // 🔹 volume control
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume / 100;
@@ -55,7 +70,6 @@ export default function PlayerBar() {
           progress={progress}
           setProgress={setProgress}
           duration={duration}
-          isPlaying={isPlaying}
           audioRef={audioRef}
         />
       </div>
@@ -75,13 +89,14 @@ export default function PlayerBar() {
           </div>
         </div>
 
+        {/* Controls */}
         <div className="flex items-center gap-6 w-1/3 justify-center">
           <SkipBack />
           <div
-            onClick={() => setIsPlaying((p) => !p)}
-            className="w-10 h-10 rounded-full bg-[#00FF88] flex items-center justify-center text-black cursor-pointer"
+            onClick={() => setIsPlay(!isPlay)}
+            className="w-10 h-10 rounded-full bg-[#00FF88] flex items-center justify-center text-black"
           >
-            {isPlaying ? (
+            {isPlay ? (
               <svg width="24" height="24" fill="currentColor">
                 <rect x="5" y="4" width="4" height="16" />
                 <rect x="15" y="4" width="4" height="16" />

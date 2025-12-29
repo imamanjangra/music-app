@@ -1,24 +1,17 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function useSongDetails() {
-  const [value, setValue] = useState(null);
-
-  const Api = "https://saavn.sumit.co/api/songs/prJPLljw";
-
-  const fetchSong = async () => {
-    try {
-      const resp = await axios.get(Api);
-      console.log(resp.data);
-      setValue(resp.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+export default function Song_details(id) {
+  const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetchSong();
-  }, []);
+    if (!id) return;
 
-  return value;
+    axios
+      .get(`https://saavn.sumit.co/api/songs/${id}`)
+      .then((res) => setData(res.data))
+      .catch(console.log);
+  }, [id]);
+
+  return data;
 }

@@ -84,7 +84,7 @@ function App() {
                 />
 
                 <Route
-                  path="/playlist"
+                  path="/playlist/:id"
                   element={
                     <ProtectedRoute>
                       <PlaylistView />
