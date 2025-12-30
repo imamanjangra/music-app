@@ -16,7 +16,6 @@ export default function AlbumPage() {
   const songs = AlbumSongs(id);
   const sdata = songs?.data;
 
-  // 🔹 create id array
   useEffect(() => {
     if (sdata?.songs) {
       const songIds = sdata.songs.map((song) => song.id);
@@ -24,7 +23,6 @@ export default function AlbumPage() {
     }
   }, [sdata]);
 
-  // 🔹 find index of playing song
   useEffect(() => {
     if (!playId || ids.length === 0) return;
 
@@ -45,6 +43,7 @@ export default function AlbumPage() {
   }
 
   console.log("array", ids);
+  console.log("array length", ids.length);
   console.log("playid", playId);
   console.log("isplaying", isPlay);
   console.log("mainID", mainId);
@@ -53,7 +52,6 @@ export default function AlbumPage() {
     <div className="p-8 ml-64">
       <Sidebar />
 
-      {/* Album Header */}
       <div className="flex flex-col md:flex-row gap-6 py-10">
         <img
           src={sdata?.image?.[2]?.url}
@@ -91,7 +89,6 @@ export default function AlbumPage() {
         </div>
       </div>
 
-      {/* Song List */}
       <div className="mt-10">
         <div className="grid grid-cols-[40px_1fr_40px_80px] text-gray-400 text-sm px-5 pb-2 border-b border-white/10">
           <span>#</span>
@@ -103,22 +100,19 @@ export default function AlbumPage() {
         {sdata.songs.map((song, index) => (
           <div
             key={song.id}
-            className={`group grid grid-cols-[40px_1fr_40px_80px] items-center px-5 py-3 rounded-lg cursor-pointer
+            className={`group grid grid-cols-[40px_1fr_40px_80px] items-center px-5 py-3 my-2 rounded-lg cursor-pointer
               ${mainId === index ? "bg-white/10" : "hover:bg-white/10"}
             `}
           >
-            {/* Index / Play */}
             <div className="relative flex items-center justify-center text-gray-400">
-              {/* Track number */}
               <span
                 className={`mr-7 transition
-                  ${mainId === index && isPlay ? "opacity-0" : "group-hover:opacity-0"}
+                  ${mainId === index ? "opacity-0" : "group-hover:opacity-0"}
                 `}
               >
                 {index + 1}
               </span>
 
-              {/* Play / Pause Icon */}
               <span
                 onClick={() => {
                   setPlayId(song.id);
@@ -126,7 +120,7 @@ export default function AlbumPage() {
                 }}
                 className={`absolute mr-7 transition cursor-pointer
                   ${
-                    mainId === index && isPlay
+                    mainId === index
                       ? "opacity-100"
                       : "opacity-0 group-hover:opacity-100"
                   }
@@ -140,7 +134,6 @@ export default function AlbumPage() {
               </span>
             </div>
 
-            {/* Title */}
             <div>
               <p className="font-medium">{song.name}</p>
               <p className="text-sm text-gray-400">
@@ -148,12 +141,10 @@ export default function AlbumPage() {
               </p>
             </div>
 
-            {/* Like */}
             <button className="text-gray-400 hover:text-green-500 transition">
               <Heart size={18} />
             </button>
 
-            {/* Duration */}
             <span className="text-right text-gray-400">
               {Math.floor(song.duration / 60)}:
               {(song.duration % 60).toString().padStart(2, "0")}
@@ -161,12 +152,12 @@ export default function AlbumPage() {
           </div>
         ))}
 
-        {/* Player */}
         <PlayerBar
           mainId={mainId}
           value={ids}
           isPlay={isPlay}
           setIsPlay={setIsPlay}
+          setMainId={setMainId}
         />
       </div>
     </div>

@@ -4,24 +4,43 @@ import VolumeControl from "./VolumeControl";
 import ProgressBar from "./ProgressBar";
 import Song_details from "../Hooks/song_details";
 
-export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
+export default function PlayerBar({
+  mainId,
+  value,
+  isPlay,
+  setIsPlay,
+  setMainId,
+}) {
   const [volume, setVolume] = useState(50);
   const [id, setId] = useState(null);
   const [progress, setProgress] = useState(0);
 
   const audioRef = useRef(null);
 
-  // 🔹 set song id when index changes
   useEffect(() => {
     if (mainId === null || !value?.length) return;
     setId(value[mainId]);
   }, [mainId, value]);
 
+  const NextSong = () => {
+    if (mainId == value.length - 1) {
+      setMainId(0);
+    } else {
+      setMainId(mainId + 1);
+    }
+  };
+
+  const BackSong = () => {
+    if (mainId == 0) {
+      setMainId(value.length - 1);
+    } else {
+      setMainId(mainId - 1);
+    }
+  };
   const api_data = Song_details(id);
   const song = api_data?.data?.[0];
   const duration = Number(song?.duration || 0);
 
-  // 🔹 create & load audio
   useEffect(() => {
     if (!song) return;
 
@@ -36,15 +55,19 @@ export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
       setProgress(audio.currentTime);
     };
 
-    audio.addEventListener("timeupdate", updateProgress);
+    const handleEnded = () => {
+      setMainId((prev) => (prev === value.length - 1 ? 0 : prev + 1));
+    };
 
-    if (isPlay) {
-      audio.play();
-    }
+    audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("ended", handleEnded);
+
+    if (isPlay) audio.play();
 
     return () => {
       audio.pause();
       audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [song]);
 
@@ -54,7 +77,6 @@ export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
     isPlay ? audioRef.current.play() : audioRef.current.pause();
   }, [isPlay]);
 
-  // 🔹 volume control
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume / 100;
@@ -89,9 +111,8 @@ export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex items-center gap-6 w-1/3 justify-center">
-          <SkipBack />
+          <SkipBack onClick={BackSong} />
           <div
             onClick={() => setIsPlay(!isPlay)}
             className="w-10 h-10 rounded-full bg-[#00FF88] flex items-center justify-center text-black"
@@ -107,7 +128,7 @@ export default function PlayerBar({ mainId, value, isPlay, setIsPlay }) {
               </svg>
             )}
           </div>
-          <SkipForward />
+          <SkipForward onClick={NextSong} />
         </div>
 
         <div className="w-1/3 flex justify-end">
