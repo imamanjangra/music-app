@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
-import { Sidebar } from "../components/sidebar";
 
 const categories = [
   { title: "Pop", gradient: "from-red-500 to-yellow-600" },
@@ -25,8 +24,7 @@ export default function SearchPage() {
   }, [query]);
 
   return (
-    <div className="p-4 md:p-8 pb-32 ml-64">
-      <Sidebar />
+    <div className="p-4 md:p-8 ">
       <div className="mb-6 md:mb-8  ">
         <h1 className="mb-4 md:mb-6 text-2xl font-bold">Search</h1>
 

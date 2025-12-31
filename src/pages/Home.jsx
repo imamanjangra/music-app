@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Play } from "lucide-react";
-import { Sidebar } from "../components/sidebar";
 import Topsong_api from "../components/Hooks/Topsong_api";
 import {
   Carousel,
@@ -11,8 +9,6 @@ import {
 } from "@/components/ui/carousel";
 import { useNavigate } from "react-router-dom";
 import ArtistCarousel from "../components/ui/Artistcomp";
-// import ArtistApi from "../components/Hooks/ArtistApi";
-// import AlbumSongs from "../components/Hooks/AlbumSongs";
 
 export default function Home() {
   const AlbumData = Topsong_api();
@@ -21,17 +17,14 @@ export default function Home() {
 
   if (!shortData.length) {
     return (
-      <div className="p-8 ml-64">
-        <Sidebar />
+      <div className="p-8">
         <p>Loading Top Songs...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8 pb-32 ml-64 select-none">
-      <Sidebar />
-
+    <div className="p-8 pb-32 select-none">
       <div className="mb-6">
         <h1 className="mb-1 text-xl font-semibold">Good evening</h1>
         <p className="text-muted-foreground text-sm">
@@ -39,7 +32,6 @@ export default function Home() {
         </p>
       </div>
 
-      {/* TOP SONGS */}
       <section className="mb-10">
         <h2 className="mb-4">Top Album</h2>
 
@@ -78,12 +70,11 @@ export default function Home() {
             ))}
           </CarouselContent>
 
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
+          <CarouselPrevious className="left-0" />
+          <CarouselNext className="right-0" />
         </Carousel>
       </section>
 
-      {/* ARTISTS */}
       <ArtistCarousel />
     </div>
   );

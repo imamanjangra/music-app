@@ -18,7 +18,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Auto-navigate if user is already authenticated
   useEffect(() => {
     if (user && !loading) {
       navigate("/home");

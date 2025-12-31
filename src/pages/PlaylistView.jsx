@@ -1,60 +1,30 @@
 import { Play, Pause, Shuffle, Heart } from "lucide-react";
-import { Sidebar } from "../components/sidebar";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import AlbumSongs from "../components/Hooks/AlbumSongs";
-import { useEffect, useState } from "react";
-import PlayerBar from "../components/ui/PlayerBar";
 
 export default function AlbumPage() {
   const { id } = useParams();
 
-  const [ids, setIds] = useState([]); // all song ids
-  const [playId, setPlayId] = useState(null); // clicked song id
-  const [isPlay, setIsPlay] = useState(false);
-  const [mainId, setMainId] = useState(null); // index of playing song
+  // GLOBAL PLAYER STATE
+  const { ids, setIds, mainId, setMainId, isPlay, setIsPlay } =
+    useOutletContext();
 
   const songs = AlbumSongs(id);
   const sdata = songs?.data;
 
-  useEffect(() => {
-    if (sdata?.songs) {
-      const songIds = sdata.songs.map((song) => song.id);
-      setIds(songIds);
-    }
-  }, [sdata]);
+  if (!sdata) return <p className="p-8">Loading Top Songs...</p>;
 
-  useEffect(() => {
-    if (!playId || ids.length === 0) return;
+  const albumSongIds = sdata.songs.map((song) => song.id);
 
-    const currentIndex = ids.indexOf(playId);
-
-    if (currentIndex !== -1) {
-      setMainId(currentIndex);
-    }
-  }, [playId, ids]);
-
-  if (!sdata) {
-    return (
-      <div className="p-8 ml-64">
-        <Sidebar />
-        <p>Loading Top Songs...</p>
-      </div>
-    );
-  }
-
-  console.log("array", ids);
-  console.log("array length", ids.length);
-  console.log("playid", playId);
-  console.log("isplaying", isPlay);
-  console.log("mainID", mainId);
+  // check if currently playing song belongs to this album
+  const isSameAlbum = ids.length && albumSongIds.includes(ids[mainId]);
 
   return (
-    <div className="p-8 ml-64">
-      <Sidebar />
-
+    <div className="p-8">
+      {/* ALBUM HEADER */}
       <div className="flex flex-col md:flex-row gap-6 py-10">
         <img
-          src={sdata?.image?.[2]?.url}
+          src={sdata.image?.[2]?.url}
           alt={sdata.name}
           className="w-56 h-56 rounded-xl shadow-lg"
         />
@@ -65,17 +35,23 @@ export default function AlbumPage() {
           <p className="text-gray-400 mt-2">{sdata.description}</p>
 
           <div className="flex gap-4 mt-6">
+            {/* PLAY BUTTON */}
             <button
               onClick={() => {
-                if (mainId === null && ids.length > 0) {
+                // if another album is playing → start this album
+                if (!isSameAlbum) {
+                  setIds(albumSongIds);
                   setMainId(0);
-                  setPlayId(ids[0]);
+                  setIsPlay(true);
                 }
-                setIsPlay((prev) => !prev);
+                // same album → toggle play / pause
+                else {
+                  setIsPlay((prev) => !prev);
+                }
               }}
               className="flex items-center gap-2 bg-green-500 px-6 py-3 rounded-full font-medium hover:bg-green-600"
             >
-              {isPlay ? (
+              {isPlay && isSameAlbum ? (
                 <Pause size={16} className="text-white" />
               ) : (
                 <Play size={16} className="text-white" />
@@ -89,51 +65,50 @@ export default function AlbumPage() {
         </div>
       </div>
 
-      <div className="mt-10">
-        <div className="grid grid-cols-[40px_1fr_40px_80px] text-gray-400 text-sm px-5 pb-2 border-b border-white/10">
-          <span>#</span>
-          <span>Title</span>
-          <span></span>
-          <span className="text-right">Time</span>
-        </div>
+      {/* SONG LIST HEADER */}
+      <div className="grid grid-cols-[40px_1fr_40px_80px] text-gray-400 text-sm px-5 pb-2 border-b border-white/10">
+        <span>#</span>
+        <span>Title</span>
+        <span></span>
+        <span className="text-right">Time</span>
+      </div>
 
-        {sdata.songs.map((song, index) => (
+      {/* SONG LIST */}
+      {sdata.songs.map((song, index) => {
+        const isCurrentSong = isSameAlbum && mainId === index && isPlay;
+
+        return (
           <div
             key={song.id}
             className={`group grid grid-cols-[40px_1fr_40px_80px] items-center px-5 py-3 my-2 rounded-lg cursor-pointer
-              ${mainId === index ? "bg-white/10" : "hover:bg-white/10"}
+              ${isCurrentSong ? "bg-white/10" : "hover:bg-white/10"}
             `}
           >
-            <div className="relative flex items-center justify-center text-gray-400">
-              <span
-                className={`mr-7 transition
-                  ${mainId === index ? "opacity-0" : "group-hover:opacity-0"}
-                `}
-              >
-                {index + 1}
-              </span>
+            {/* INDEX / PLAY */}
+            <div className="relative flex items-center justify-center w-8 text-gray-400">
+              {!isCurrentSong && (
+                <span className="group-hover:opacity-0 transition">
+                  {index + 1}
+                </span>
+              )}
 
               <span
                 onClick={() => {
-                  setPlayId(song.id);
-                  setIsPlay((prev) => (mainId === index ? !prev : true));
+                  setIds(albumSongIds);
+                  setMainId(index);
+                  setIsPlay(true);
                 }}
-                className={`absolute mr-7 transition cursor-pointer
-                  ${
-                    mainId === index
-                      ? "opacity-100"
-                      : "opacity-0 group-hover:opacity-100"
-                  }
-                `}
+                className={`absolute transition ${
+                  isCurrentSong
+                    ? "opacity-100"
+                    : "opacity-0 group-hover:opacity-100"
+                }`}
               >
-                {mainId === index && isPlay ? (
-                  <Pause size={16} className="text-white" />
-                ) : (
-                  <Play size={16} className="text-white" />
-                )}
+                {isCurrentSong ? <Pause size={16} /> : <Play size={16} />}
               </span>
             </div>
 
+            {/* TITLE */}
             <div>
               <p className="font-medium">{song.name}</p>
               <p className="text-sm text-gray-400">
@@ -141,25 +116,15 @@ export default function AlbumPage() {
               </p>
             </div>
 
-            <button className="text-gray-400 hover:text-green-500 transition">
-              <Heart size={18} />
-            </button>
+            <Heart size={18} className="text-gray-400 hover:text-green-500" />
 
             <span className="text-right text-gray-400">
               {Math.floor(song.duration / 60)}:
               {(song.duration % 60).toString().padStart(2, "0")}
             </span>
           </div>
-        ))}
-
-        <PlayerBar
-          mainId={mainId}
-          value={ids}
-          isPlay={isPlay}
-          setIsPlay={setIsPlay}
-          setMainId={setMainId}
-        />
-      </div>
+        );
+      })}
     </div>
   );
 }

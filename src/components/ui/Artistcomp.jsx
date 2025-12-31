@@ -60,8 +60,8 @@ export default function ArtistCarousel() {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="left-2" />
-        <CarouselNext className="right-2" />
+        <CarouselPrevious className="left-0" />
+        <CarouselNext className="right-0" />
       </Carousel>
     </section>
   );
