@@ -1,5 +1,4 @@
 import { Heart, Play, MoreHorizontal } from "lucide-react";
-import { Sidebar } from "../components/sidebar";
 
 const likedSongs = [
   {
@@ -22,9 +21,7 @@ export default function LikedSongs() {
   };
 
   return (
-    <div className="p-8 pb-32 ml-64">
-      <Sidebar />
-
+    <div className="p-8 pb-32 ">
       <div className="mb-8">
         <div className="flex items-end gap-6 mb-6">
           <div className="w-48 h-48 rounded-lg bg-linear-to-br from-[#00ff88] to-[#00cc6f] flex items-center justify-center shadow-2xl">

@@ -20,12 +20,12 @@ export default function ProgressBar({
 
       <div className="relative flex-1 h-2 bg-neutral-700 rounded-full">
         <div
-          className="absolute h-2 bg-green-500 rounded-full"
+          className="absolute h-2 bg-[#00FF88] rounded-full"
           style={{ width: `${percent}%` }}
         />
 
         <div
-          className="absolute top-1/2 w-4 h-4 bg-green-400 rounded-full -translate-y-1/2"
+          className="absolute top-1/2 w-4 h-4 bg-[#00FF88] rounded-full -translate-y-1/2"
           style={{ left: `calc(${percent}% - 8px)` }}
         />
 
@@ -35,10 +35,10 @@ export default function ProgressBar({
           max={duration}
           value={progress}
           onChange={(e) => {
-            const value = Number(e.target.value);
-            setProgress(value);
-            if (audioRef.current != value) {
-              audioRef.current.currentTime = value;
+            const val = Number(e.target.value);
+            setProgress(val);
+            if (audioRef.current) {
+              audioRef.current.currentTime = val;
             }
           }}
           className="absolute inset-0 opacity-0 cursor-pointer"

@@ -1,5 +1,4 @@
 import { Plus, Play } from "lucide-react";
-import { Sidebar } from "../components/sidebar";
 
 const playlists = [
   {
@@ -17,9 +16,7 @@ export default function LibraryPage() {
   };
 
   return (
-    <div className="p-8 pb-32 ml-64">
-      <Sidebar />
-
+    <div className="p-8 pb-32 ">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -43,7 +40,6 @@ export default function LibraryPage() {
         {playlists.map((playlist) => (
           <div key={playlist.id}>
             <div className="group bg-card rounded-xl p-4 hover:bg-muted/50 transition cursor-pointer">
-              {/* Image */}
               <div className="relative aspect-square rounded-lg overflow-hidden mb-4 bg-muted">
                 <img
                   src={playlist.image}

@@ -2,15 +2,35 @@ import { SkipBack, SkipForward } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import VolumeControl from "./VolumeControl";
 import ProgressBar from "./ProgressBar";
-import song_details from "../Hooks/song_details";
+import Song_details from "../Hooks/song_details";
 
-export default function PlayerBar() {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function PlayerBar({
+  mainId,
+  value,
+  isPlay,
+  setIsPlay,
+  setMainId,
+}) {
   const [volume, setVolume] = useState(50);
+  const [id, setId] = useState(null);
   const [progress, setProgress] = useState(0);
 
   const audioRef = useRef(null);
-  const api_data = song_details();
+
+  useEffect(() => {
+    if (mainId === null || !value?.length) return;
+    setId(value[mainId]);
+  }, [mainId, value]);
+
+  const NextSong = () => {
+    setMainId(mainId === value.length - 1 ? 0 : mainId + 1);
+  };
+
+  const BackSong = () => {
+    setMainId(mainId === 0 ? value.length - 1 : mainId - 1);
+  };
+
+  const api_data = Song_details(id);
   const song = api_data?.data?.[0];
   const duration = Number(song?.duration || 0);
 
@@ -18,27 +38,36 @@ export default function PlayerBar() {
     if (!song) return;
 
     const songUrl = song.downloadUrl?.[4]?.url;
-    const audio = new Audio(songUrl);
+    if (!songUrl) return;
 
+    const audio = new Audio(songUrl);
+    audio.volume = volume / 100;
     audioRef.current = audio;
 
     const updateProgress = () => {
       setProgress(audio.currentTime);
     };
 
+    const handleEnded = () => {
+      setMainId((prev) => (prev === value.length - 1 ? 0 : prev + 1));
+    };
+
     audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("ended", handleEnded);
+
+    if (isPlay) audio.play();
 
     return () => {
       audio.pause();
       audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [song]);
 
   useEffect(() => {
     if (!audioRef.current) return;
-
-    isPlaying ? audioRef.current.play() : audioRef.current.pause();
-  }, [isPlaying]);
+    isPlay ? audioRef.current.play() : audioRef.current.pause();
+  }, [isPlay]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -49,53 +78,54 @@ export default function PlayerBar() {
   if (!song) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#111] text-white">
-      <div className="px-6 pt-2">
+    <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-[#111] text-white z-40">
+      <div className="px-4 md:px-6 pt-2">
         <ProgressBar
           progress={progress}
           setProgress={setProgress}
           duration={duration}
-          isPlaying={isPlaying}
           audioRef={audioRef}
         />
       </div>
 
-      <div className="h-20 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-4 w-1/3">
+      <div className="h-14 px-4 md:px-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 w-1/3 min-w-0">
           <img
             src={song.image?.[0]?.url}
             alt="song"
-            className="w-12 h-12 rounded"
+            className="w-10 h-10 rounded"
           />
-          <div>
-            <p className="text-sm font-medium">{song.name}</p>
-            <p className="text-xs text-gray-400">
+          <div className="truncate">
+            <p className="text-sm font-medium truncate">{song.name}</p>
+            <p className="text-xs text-gray-400 truncate">
               {song.artists?.primary?.[0]?.name}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6 w-1/3 justify-center">
-          <SkipBack />
+        <div className="flex items-center gap-4 w-1/3 justify-center">
+          <SkipBack onClick={BackSong} size={18} />
+
           <div
-            onClick={() => setIsPlaying((p) => !p)}
-            className="w-10 h-10 rounded-full bg-[#00FF88] flex items-center justify-center text-black cursor-pointer"
+            onClick={() => setIsPlay(!isPlay)}
+            className="w-9 h-9 rounded-full bg-[#00FF88] flex items-center justify-center text-black"
           >
-            {isPlaying ? (
-              <svg width="24" height="24" fill="currentColor">
-                <rect x="5" y="4" width="4" height="16" />
-                <rect x="15" y="4" width="4" height="16" />
+            {isPlay ? (
+              <svg width="18" height="18" fill="currentColor">
+                <rect x="4" y="3" width="3" height="12" />
+                <rect x="11" y="3" width="3" height="12" />
               </svg>
             ) : (
-              <svg width="24" height="24" fill="currentColor">
-                <polygon points="5,3 19,12 5,21" />
+              <svg width="18" height="18" fill="currentColor">
+                <polygon points="4,3 15,9 4,15" />
               </svg>
             )}
           </div>
-          <SkipForward />
+
+          <SkipForward onClick={NextSong} size={18} />
         </div>
 
-        <div className="w-1/3 flex justify-end">
+        <div className="hidden md:flex w-1/3 justify-end">
           <VolumeControl
             volume={volume}
             setVolume={setVolume}

@@ -57,7 +57,7 @@ export const Profile = () => {
       <Sidebar />
 
       <motion.div
-        className="flex-1 p-8 pb-32 ml-64 overflow-hidden"
+        className="flex-1 p-8 pb-32  overflow-hidden"
         initial="hidden"
         animate="visible"
         variants={containerVariants}

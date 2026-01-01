@@ -4,78 +4,55 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/FirebaseContext";
+import { ToastProvider } from "./context/toastContext";
+
 import Login from "./pages/login";
 import SignUp from "./pages/signup";
 import Home from "./pages/Home.jsx";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { ToastProvider } from "./context/toastContext";
+import LikedSongs from "./pages/LikedSongs.jsx";
+import LibraryPage from "./pages/LibraryPage.jsx";
+import SearchPage from "./pages/SearchPage.jsx";
+import PlaylistView from "./pages/PlaylistView.jsx";
+import ArtistPage from "./pages/ArtistPage.jsx";
+import CategoryPage from "./pages/CategoryPage.jsx";
 import { Profile } from "./pages/profile";
+import MainLayout from "./components/Layout/MainLayout";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <ToastProvider>
       <ThemeProvider>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen flex items-center justify-center p-4">
-              <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
+            <Routes>
+              <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
 
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <MainLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/home" element={<Home />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/library" element={<LibraryPage />} />
+                <Route path="/favorites" element={<LikedSongs />} />
+                <Route path="/playlist/:id" element={<PlaylistView />} />
+                <Route path="/artist/:id" element={<ArtistPage />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/category/:category" element={<CategoryPage />} />
+              </Route>
 
-                <Route
-                  path="/home"
-                  element={
-                    <ProtectedRoute>
-                      <Home />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/search"
-                  element={
-                    <ProtectedRoute>
-                      <SearchPage />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/library"
-                  element={
-                    <ProtectedRoute>
-                      <LibraryPage />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/favorites"
-                  element={
-                    <ProtectedRoute>
-                      <LikedSongs />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route path="*" element={<Navigate to="/login" />} />
-              </Routes>
-
-              {/* Global Player */}
-              <PlayerBar />
-            </div>
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
           </Router>
         </AuthProvider>
       </ThemeProvider>
