@@ -73,7 +73,10 @@ export const Profile = () => {
                 <h2 className="text-2xl font-semibold mb-1">
                   {user?.displayName || "Music Enthusiast"}
                 </h2>
-                <p className="text-muted-foreground mb-4">{user?.email}</p>
+                <p className="text-muted-foreground mb-4 break-all">
+                  {user?.email}
+                </p>
+
                 <button className="px-4 py-1.5 border border-border bg-background rounded-md text-sm font-medium hover:bg-accent transition-colors">
                   Edit Profile
                 </button>
