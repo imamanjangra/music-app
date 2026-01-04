@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Play } from "lucide-react";
 import SerchResult from "../components/Hooks/SerchResult";
 import SearchLoader from "../components/ui/SearchLoader";
-y;
 
 export default function Serch() {
   const { query } = useParams();
