@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Moon, LogOut, Headphones } from "lucide-react";
 import { useAuth } from "../context/FirebaseContext";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/themeContext";
 import { useToast } from "../context/toastContext";
 import { Sidebar } from "../components/sidebar";
 import { useNavigate } from "react-router-dom";
