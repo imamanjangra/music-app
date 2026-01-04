@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "./context/themeContext";
 import { AuthProvider } from "./context/FirebaseContext";
 import { ToastProvider } from "./context/toastContext";
 
